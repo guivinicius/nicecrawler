@@ -1,4 +1,3 @@
-nicecrawler
-===========
+# nicecrawler
 
 A simple web crawler
