@@ -32,6 +32,7 @@ GEM
     nio4r (1.0.0)
     nokogiri (1.6.1)
       mini_portile (~> 0.5.0)
+    open_uri_redirections (0.1.4)
     pry (0.9.12.6)
       coderay (~> 1.0)
       method_source (~> 0.8)
@@ -62,5 +63,6 @@ PLATFORMS
 DEPENDENCIES
   guard-rspec (~> 4.2.4)
   nokogiri
+  open_uri_redirections
   rspec
   simplecov

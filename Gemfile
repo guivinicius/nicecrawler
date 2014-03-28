@@ -1,6 +1,7 @@
 source 'https://rubygems.org'
 
 gem 'nokogiri'
+gem 'open_uri_redirections'
 
 group :test do
   gem 'rspec'

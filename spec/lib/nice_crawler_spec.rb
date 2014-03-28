@@ -2,10 +2,23 @@ require 'spec_helper'
 
 describe NiceCrawler do
 
-  let(:url) { "http://digitalocean.com" }
+  let(:url) { 'https://digitalocean.com' }
 
-  it 'returns a new instance' do
-    expect(NiceCrawler.new(url)).to be_instance_of(NiceCrawler)
+  describe 'instanciation' do
+
+    it 'returns a new instance' do
+      expect(NiceCrawler.new(url)).to be_instance_of(NiceCrawler)
+    end
+
+    it 'raises an error' do
+      expect { NiceCrawler.new('') }.to raise_error
+    end
+  end
+
+  describe '#crawl' do
+
+    let(:crawler) { NiceCrawler.new(url) }
+
   end
 
 end
