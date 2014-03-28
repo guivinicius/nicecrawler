@@ -7,9 +7,7 @@ class NiceCrawler
     fail 'url is required' if url.empty?
 
     @base_url    = build_base_url(url)
-
     @sitemap     = []
-
     @crawl_queue = [@base_url]
   end
 
