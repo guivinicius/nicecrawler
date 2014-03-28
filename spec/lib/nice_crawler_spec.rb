@@ -2,7 +2,15 @@ require 'spec_helper'
 
 describe NiceCrawler do
 
-  let(:url) { 'https://digitalocean.com' }
+  let(:url) { 'http://example.com' }
+
+  before do
+    PageMock.new('', links: ['', '/about'], hrefs: ['help'], assets: ['logo.png'])
+    PageMock.new('/about', links: ['','/about','/help'], assets: ['logo.png'])
+    PageMock.new('/help', links: ['', '/about', '/help'], hrefs: ['help/article-1','help/article-2'], assets: ['logo.png', 'helper.png'])
+    PageMock.new('/help/article-1', links: [''], assets: ['logo.png', 'cover1.png'])
+    PageMock.new('/help/article-2', links: [''], assets: ['logo.png', 'cover2.png'])
+  end
 
   describe 'instanciation' do
 
@@ -18,6 +26,11 @@ describe NiceCrawler do
   describe '#crawl' do
 
     let(:crawler) { NiceCrawler.new(url) }
+    let(:result) { File.open(File.expand_path('../../support/sitemap.json', __FILE__)) }
+
+    it 'returns a json' do
+      expect(crawler.crawl).to eq(result.read.strip)
+    end
 
   end
 

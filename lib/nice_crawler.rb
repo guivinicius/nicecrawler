@@ -6,19 +6,16 @@ class NiceCrawler
   def initialize(url)
     fail 'url is required' if url.empty?
 
-    @base_url = url
+    @base_url    = build_base_url(url)
 
-    @sitemap  = []
-    @crawled  = []
+    @sitemap     = []
+
+    @crawl_queue = [@base_url]
   end
 
   def crawl
-    Nokogiri::HTML(open(@base_url, allow_redirections: :all)).css('a[href^="/"]').each do |link|
-
-      value = link.attributes['href'].value
-
-      crawl_url(@base_url + value) unless @crawled.include?(value)
-      break
+    @crawl_queue.each do |url|
+      crawl_url(url)
     end
 
     @sitemap.to_json
@@ -29,10 +26,39 @@ class NiceCrawler
   def crawl_url(url)
     page = Nokogiri::HTML(open(url, allow_redirections: :all))
 
-    links = page.css('a[href^="/"]').map { |l| l.attributes['href'].value }
-    assets = page.css('[src^="/"]').map { |a| a.attributes['src'].value }
+    links = page.css('a').map do |link|
+      value = link.attributes['href'].value
+      if value.start_with?('/')
+        "#{@base_url}#{value}"
+      elsif value.start_with?(@base_url)
+        value
+      end
+    end
+
+    assets = page.css('[src]').map do |asset|
+      value = asset.attributes['src'].value
+      if value.start_with?('/') && !value.start_with?('//')
+        "#{@base_url}#{value}"
+      elsif value.start_with?(@base_url)
+        value
+      end
+    end
+
+    check_new_discoveries(links)
 
     @sitemap << { url: url, links: links, assets: assets }
-    @crawled << url
+  end
+
+  def build_base_url(url)
+    scheme = URI.parse(url).scheme || 'http'
+    host   = URI.parse(url).host.downcase
+
+    "#{scheme}://#{host}"
+  end
+
+  def check_new_discoveries(links)
+    links.each do |link|
+      @crawl_queue << link unless @crawl_queue.include?(link)
+    end
   end
 end
