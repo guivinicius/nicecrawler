@@ -13,20 +13,49 @@ describe NiceCrawler do
   end
 
   describe 'instanciation' do
-
-    it 'returns a new instance' do
-      expect(NiceCrawler.new(url)).to be_instance_of(NiceCrawler)
+    context 'when an empty value is passed' do
+      it 'raises an error' do
+        expect { NiceCrawler.new('') }.to raise_error
+      end
     end
 
-    it 'raises an error' do
-      expect { NiceCrawler.new('') }.to raise_error
+    context 'when url is clean' do
+      it 'returns a new instance' do
+        expect(NiceCrawler.new(url)).to be_instance_of(NiceCrawler)
+      end
+
+      it 'returns the base url' do
+        expect(NiceCrawler.new(url).base_url).to eq(url)
+      end
+    end
+
+    context 'when url is dirty' do
+
+      let(:dirty_url) { url + '/something?dirty=true' }
+
+      it 'returns a new instance' do
+        expect(NiceCrawler.new(dirty_url)).to be_instance_of(NiceCrawler)
+      end
+
+      it 'returns the base url' do
+        expect(NiceCrawler.new(dirty_url).base_url).to eq(url)
+      end
+    end
+
+    context 'when url is only a domain' do
+      let(:domain) { 'example.com' }
+
+      it 'raises an error' do
+        expect { NiceCrawler.new(domain) }.to raise_error
+      end
+
     end
   end
 
   describe '#crawl' do
 
     let(:crawler) { NiceCrawler.new(url) }
-    let(:result) { File.open(File.expand_path('../../support/sitemap.json', __FILE__)) }
+    let(:result)  { File.open(File.expand_path('../../support/sitemap.json', __FILE__)) }
 
     it 'returns a json' do
       expect(crawler.crawl).to eq(result.read.strip)

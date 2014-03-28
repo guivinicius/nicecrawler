@@ -3,6 +3,9 @@ require 'open-uri'
 require 'open_uri_redirections'
 
 class NiceCrawler
+
+  attr_reader :base_url
+
   def initialize(url)
     fail 'url is required' if url.empty?
 
@@ -48,6 +51,8 @@ class NiceCrawler
   end
 
   def build_base_url(url)
+    fail 'url needs to be valid' unless url.match(%r(https?:\/\/[\S]+))
+
     scheme = URI.parse(url).scheme || 'http'
     host   = URI.parse(url).host.downcase
 
