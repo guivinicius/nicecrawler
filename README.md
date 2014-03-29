@@ -18,10 +18,10 @@ receive your site map.
 
 ## Command line
 
-```ruby
-  gem install nice_crawler
-  nicecrawler http://digitalocean.com
-  # output a json sitemap
+```bash
+  cd YOUR_PATH/nicecrawler
+  bundle install
+  ./bin/nicecrawler http://digitalocean.com > sitemap.json
 ```
 
 ## Ruby scripting

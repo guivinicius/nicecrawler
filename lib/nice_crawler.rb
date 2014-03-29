@@ -1,15 +1,16 @@
 require 'nokogiri'
 require 'open-uri'
 require 'open_uri_redirections'
+require 'json'
 
 class NiceCrawler
-
   attr_reader :base_url
 
   def initialize(url)
-    fail 'url is required' if url.empty?
+    fail 'url is required' if url.nil? || url.empty?
 
-    @base_url    = build_base_url(url)
+    @uri         = URI.parse(url)
+    @base_url    = build_base_url
     @sitemap     = []
     @crawl_queue = [@base_url]
   end
@@ -25,36 +26,21 @@ class NiceCrawler
   private
 
   def crawl_url(url)
-    page = Nokogiri::HTML(open(url, allow_redirections: :all))
+    page   = Nokogiri::HTML(open(url, allow_redirections: :all))
 
-    links = page.css('a').map do |link|
-      value = link.attributes['href'].value
-      if value.start_with?('/')
-        "#{@base_url}#{value}"
-      elsif value.start_with?(@base_url)
-        value
-      end
-    end
-
-    assets = page.css('[src]').map do |asset|
-      value = asset.attributes['src'].value
-      if value.start_with?('/') && !value.start_with?('//')
-        "#{@base_url}#{value}"
-      elsif value.start_with?(@base_url)
-        value
-      end
-    end
+    links  = clear_elements(page.css('a[href]'), 'href')
+    assets = clear_elements(page.css('[src]'), 'src')
 
     check_new_discoveries(links)
 
     @sitemap << { url: url, links: links, assets: assets }
   end
 
-  def build_base_url(url)
-    fail 'url needs to be valid' unless url.match(%r(https?:\/\/[\S]+))
+  def build_base_url
+    fail 'url needs to be valid' unless @uri.kind_of?(URI::Generic)
 
-    scheme = URI.parse(url).scheme || 'http'
-    host   = URI.parse(url).host.downcase
+    scheme = @uri.scheme || 'http'
+    host   = @uri.host.downcase
 
     "#{scheme}://#{host}"
   end
@@ -63,5 +49,16 @@ class NiceCrawler
     links.each do |link|
       @crawl_queue << link unless @crawl_queue.include?(link)
     end
+  end
+
+  def clear_elements(elements, attribute)
+    elements.map do |asset|
+      value = asset.attributes["#{attribute}"].value
+      if value.start_with?('/') && !value.start_with?('//')
+        "#{@base_url}#{value}"
+      elsif value.start_with?(@base_url)
+        value
+      end
+    end.compact
   end
 end
