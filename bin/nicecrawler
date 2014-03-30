@@ -4,7 +4,10 @@ $LOAD_PATH << File.expand_path('../../lib', __FILE__)
 require 'nice_crawler'
 require 'pp'
 
-crawler = NiceCrawler.new(ARGV[0])
-crawler.crawl
-
-pp crawler.sitemap
+begin
+  crawler = NiceCrawler.new(ARGV[0])
+  crawler.crawl
+  pp crawler.sitemap
+rescue => e
+  puts e
+end

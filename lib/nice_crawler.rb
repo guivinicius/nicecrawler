@@ -9,8 +9,8 @@ require 'storage'
 class NiceCrawler
   attr_reader :base_url
 
-  def initialize(url, storage_opts = {})
-    fail 'url is required' if url.nil? || url.empty?
+  def initialize(url = '', storage_opts = {})
+    fail 'url is required' if url.empty?
 
     @uri         = URI.parse(url)
     @base_url    = build_base_url
@@ -47,7 +47,7 @@ class NiceCrawler
   end
 
   def build_base_url
-    fail 'url needs to be valid' unless @uri.kind_of?(URI::Generic)
+    fail 'url needs to be valid' if @uri.instance_of?(URI::Generic)
 
     scheme = @uri.scheme || 'http'
     host   = @uri.host.downcase

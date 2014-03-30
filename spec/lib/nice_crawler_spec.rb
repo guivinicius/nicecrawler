@@ -21,7 +21,7 @@ describe NiceCrawler do
       end
     end
 
-    context 'when url is clean' do
+    context 'when url is valid' do
       it 'returns a new instance' do
         expect(NiceCrawler.new(url)).to be_instance_of(NiceCrawler)
       end
