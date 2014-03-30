@@ -3,6 +3,8 @@ require 'spec_helper'
 describe NiceCrawler do
 
   let(:url) { 'http://example.com' }
+  let(:crawler) { NiceCrawler.new(url) }
+  let(:result)  { File.open(File.expand_path('../../support/sitemap.json', __FILE__)) }
 
   before do
     PageMock.new('', links: ['', '/about'], hrefs: ['help'], assets: ['logo.png'])
@@ -54,11 +56,17 @@ describe NiceCrawler do
 
   describe '#crawl' do
 
-    let(:crawler) { NiceCrawler.new(url) }
-    let(:result)  { File.open(File.expand_path('../../support/sitemap.json', __FILE__)) }
+    it 'store into database' do
+      expect { crawler.crawl }.to change { crawler.sitemap.size }.by(5)
+    end
+
+  end
+
+  describe '#sitemap' do
 
     it 'returns a json' do
-      expect(crawler.crawl).to eq(result.read.strip)
+      crawler.crawl
+      expect(crawler.sitemap.to_json).to eq(result.read.strip)
     end
 
   end

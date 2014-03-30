@@ -2,6 +2,9 @@ GEM
   remote: https://rubygems.org/
   specs:
     addressable (2.3.6)
+    bson (1.9.2)
+    bson_ext (1.9.2)
+      bson (~> 1.9.2)
     celluloid (0.15.2)
       timers (~> 1.1.0)
     celluloid-io (0.15.0)
@@ -31,6 +34,8 @@ GEM
     lumberjack (1.0.5)
     method_source (0.8.2)
     mini_portile (0.5.3)
+    mongo (1.9.2)
+      bson (~> 1.9.2)
     multi_json (1.9.2)
     nio4r (1.0.0)
     nokogiri (1.6.1)
@@ -68,7 +73,9 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
+  bson_ext
   guard-rspec (~> 4.2.4)
+  mongo
   nokogiri
   open_uri_redirections
   rspec

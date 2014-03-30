@@ -2,6 +2,8 @@ source 'https://rubygems.org'
 
 gem 'nokogiri'
 gem 'open_uri_redirections'
+gem 'mongo'
+gem 'bson_ext'
 
 group :test do
   gem 'rspec'

@@ -3,24 +3,34 @@ require 'open-uri'
 require 'open_uri_redirections'
 require 'json'
 
+require 'mongo'
+require 'storage'
+
 class NiceCrawler
   attr_reader :base_url
 
-  def initialize(url)
+  def initialize(url, storage_opts = {})
     fail 'url is required' if url.nil? || url.empty?
 
     @uri         = URI.parse(url)
     @base_url    = build_base_url
-    @sitemap     = []
     @crawl_queue = [@base_url]
+
+    @storage     = Storage.new(@base_url, storage_opts)
   end
 
   def crawl
     @crawl_queue.each do |url|
-      crawl_url(url)
+      begin
+        @storage.append(crawl_url(url))
+      rescue => e
+        puts e
+      end
     end
+  end
 
-    @sitemap.to_json
+  def sitemap
+    @storage.sitemap
   end
 
   private
@@ -33,7 +43,7 @@ class NiceCrawler
 
     check_new_discoveries(links)
 
-    @sitemap << { url: url, links: links, assets: assets }
+    { url: url, links: links, assets: assets }
   end
 
   def build_base_url
@@ -52,8 +62,8 @@ class NiceCrawler
   end
 
   def clear_elements(elements, attribute)
-    elements.map do |asset|
-      value = asset.attributes["#{attribute}"].value
+    elements.map do |e|
+      value = e.attributes["#{attribute}"].value
       if value.start_with?('/') && !value.start_with?('//')
         "#{@base_url}#{value}"
       elsif value.start_with?(@base_url)

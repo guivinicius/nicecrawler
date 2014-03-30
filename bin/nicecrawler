@@ -1,5 +1,10 @@
 #!/usr/bin/env ruby
+$LOAD_PATH << File.expand_path('../../lib', __FILE__)
 
-require_relative '../lib/nice_crawler'
+require 'nice_crawler'
+require 'pp'
 
-puts NiceCrawler.new(ARGV[0]).crawl
+crawler = NiceCrawler.new(ARGV[0])
+crawler.crawl
+
+pp crawler.sitemap
