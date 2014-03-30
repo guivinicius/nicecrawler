@@ -2,29 +2,21 @@
 
 A simple and nice web crawler.
 
-## Browser
+It uses MongoDB to store the sitemap, so you need it to run the script.
 
-It's Sinatra so it's easy.
+http://docs.mongodb.org/manual/installation/
 
-```bash
-  cd YOUR_PATH/nicecrawler
-  bundle install
-  sinatra app.rb
-```
-
-Then go to http://localhost:3000, input a domain into the text field and
-receive your site map.
-
-
-## Command line
+## Command-line
 
 ```bash
   cd YOUR_PATH/nicecrawler
   bundle install
+  start your mongodb ...
+
   ./bin/nicecrawler http://digitalocean.com > sitemap.json
 ```
 
-## Ruby scripting
+## Ruby
 
 ```ruby
   require 'nice_crawler'
@@ -33,6 +25,21 @@ receive your site map.
 
   crawler = NiceCrawler.new(url)
   crawler.crawl
-  # or
-  crawler.be_nice_and_crawl
+  puts crawler.sitemap
+```
+
+## MongoDB Options
+
+By default it points to **localhost:27017**, but it can be changed passing
+additional parameters to the class.
+
+```ruby
+  opts = {
+    address: 111.222.11.22,
+    port: 1122,
+    database: 'myownname'
+  }
+
+  url = 'http://guivinicius.com'
+  NiceCrawler.new(url, opts).crawl
 ```
