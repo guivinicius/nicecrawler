@@ -1,8 +1,6 @@
 class Storage
   include Mongo
 
-  attr_reader :id
-
   def initialize(domain, opts = {})
     default_opts = {
       address: 'localhost',
@@ -10,16 +8,14 @@ class Storage
       database: 'nicecrawler'
     }.merge!(opts)
 
-    address  = default_opts[:address]
-    port     = default_opts[:port]
-    database = default_opts[:database]
+    address     = default_opts[:address]
+    port        = default_opts[:port]
+    database    = default_opts[:database]
 
-    @client = MongoClient.new(address, port).db(database)
-
-    @collection = create_collection
+    @client     = MongoClient.new(address, port).db(database)
+    @collection = @client.create_collection('sitemaps')
     @collection.create_index('domain')
-
-    @id = create_document(domain)
+    @id         = @collection.insert('domain' => domain, 'sitemap' => [])
   end
 
   def append(hash)
@@ -27,16 +23,6 @@ class Storage
   end
 
   def sitemap
-    @collection.find('_id' => @id).first['sitemap']
-  end
-
-  private
-
-  def create_collection
-    @client.create_collection('sitemaps')
-  end
-
-  def create_document(domain)
-    @collection.insert('domain' => domain, 'sitemap' => [])
+    @collection.find_one('_id' => @id)['sitemap']
   end
 end
